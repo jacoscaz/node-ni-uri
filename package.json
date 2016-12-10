@@ -1,6 +1,6 @@
 {
   "name": "ni-uri",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parse, format and digest utilities for Named Information (NI) URIs",
   "main": "index.js",
   "scripts": {

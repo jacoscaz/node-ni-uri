@@ -23,9 +23,9 @@ Usage
 API
 ---
 
-### ni.parse(uri, parseQuery)
+### ni.parse(uri, [parseQuery])
 ### ni.format(parts)
-### ni.digest(algorithm, data, encoding, parts)
+### ni.digest(algorithm, data, [encoding], [parts])
 
 License
 -------

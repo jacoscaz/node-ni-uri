@@ -6,8 +6,14 @@ describe('Main test suite for ni-uri', function () {
 
   it('Should digest data correctly', function () {
     var data = 'The quick brown fox jumps over the lazy dog.';
-    var uri = 'ni:///sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w';
-    ni.digest('sha-256', data).should.equal(uri);
+    var value = '71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w';
+    ni.digest('sha-256', data).should.equal(value);
+  });
+
+  it('Should digest data and format correctly', function () {
+    var data = 'The quick brown fox jumps over the lazy dog.';
+    var uri = 'ni://example.com/sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w';
+    ni.digest('sha-256', data, {host: 'example.com'}).should.equal(uri);
   });
 
   it('Should parse a complete ni uri correctly', function () {

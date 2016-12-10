@@ -12,6 +12,33 @@ var NI_ALGOS_TO_NODE_ALGOS = {
 
 var NI_URI_PATHNAME_REGEXP = /\/([a-z]{2,4}-[0-9]{2,4});([A-Za-z0-9+\-_/]+)$/;
 
+function isNull(n) {
+  return n === null;
+}
+
+function isObject(o) {
+  return typeof(o) === 'object' && !isNull(o);
+}
+
+function isString(s) {
+  return typeof(s) === 'string';
+}
+
+function extend(dest) {
+  var sources = Array.prototype.slice.call(arguments, 1);
+  for (var s = 0, source; s < sources.length; s++) {
+    source = sources[s];
+    if (isObject(source)) {
+      for (var key in source) {
+        if (source.hasOwnProperty(key)) {
+          dest[key] = source[key];
+        }
+      }
+    }
+  }
+  return dest;
+}
+
 function parse(uri, parseQuery) {
   var parts = url.parse(uri, parseQuery);
   var match = parts.pathname && parts.pathname.match(NI_URI_PATHNAME_REGEXP);
@@ -39,21 +66,25 @@ function format(parts) {
 module.exports.format = format;
 
 function digest(algorithm, data, enc, parts) {
+  if (enc && !isString(enc)) {
+    parts = enc;
+    enc = null;
+  }
   var nodeAlgorithm = NI_ALGOS_TO_NODE_ALGOS[algorithm];
   if (!nodeAlgorithm) {
     throw new Error('Unsupported algorithm.');
   }
-  if (typeof(enc) === 'object') {
-    parts = enc;
-    enc = null;
-  }
-  parts = parts ? Object.create(parts) : {};
-  parts.algorithm = algorithm;
-  parts.value = crypto.createHash(nodeAlgorithm)
+  var value = crypto.createHash(nodeAlgorithm)
     .update(data, enc)
     .digest('base64')
     .replace(/\=+$/, '');
-  return format(parts);
+  if (parts) {
+    parts = extend({}, parts);
+    parts.value = value;
+    parts.algorithm = algorithm;
+    return format(parts);
+  }
+  return value;
 }
 
 module.exports.digest = digest;
