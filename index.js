@@ -26,8 +26,10 @@ function parse(uri, parseQuery) {
 module.exports.parse = parse;
 
 function format(parts) {
+  parts = Object.create(parts);
+  parts.slashes = true;
+  parts.protocol = 'ni:';
   if (parts.algorithm && parts.value) {
-    parts = Object.create(parts);
     parts.pathname = parts.algorithm + ';' + parts.value;
     delete parts.path;
   }
@@ -46,8 +48,6 @@ function digest(algorithm, data, enc, parts) {
     enc = null;
   }
   parts = parts ? Object.create(parts) : {};
-  parts.protocol = 'ni:';
-  parts.slashes = true;
   parts.algorithm = algorithm;
   parts.value = crypto.createHash(nodeAlgorithm)
     .update(data, enc)
