@@ -39,6 +39,12 @@ function extend(dest) {
   return dest;
 }
 
+function isAlgorithmSupported(algorithm) {
+  return !!NI_ALGOS_TO_NODE_ALGOS[algorithm];
+}
+
+module.exports.isAlgorithmSupported = isAlgorithmSupported;
+
 function parse(uri, parseQuery) {
   var parts = url.parse(uri, parseQuery);
   var match = parts.pathname && parts.pathname.match(NI_URI_PATHNAME_REGEXP);
