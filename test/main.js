@@ -12,6 +12,12 @@ describe('Main test suite for ni-uri', function () {
 
   it('Should digest data and format correctly', function () {
     var data = 'The quick brown fox jumps over the lazy dog.';
+    var uri = 'ni:///sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w';
+    ni.digest('sha-256', data, true).should.equal(uri);
+  });
+
+  it('Should digest data and format correctly w/ parts', function () {
+    var data = 'The quick brown fox jumps over the lazy dog.';
     var uri = 'ni://example.com/sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w';
     ni.digest('sha-256', data, {host: 'example.com'}).should.equal(uri);
   });

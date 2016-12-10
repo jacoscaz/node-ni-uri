@@ -59,7 +59,7 @@ function parse(uri, parseQuery) {
 module.exports.parse = parse;
 
 function format(parts) {
-  parts = Object.create(parts);
+  parts = extend({}, parts);
   parts.slashes = true;
   parts.protocol = 'ni:';
   if (parts.algorithm && parts.value) {

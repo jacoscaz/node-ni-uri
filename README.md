@@ -9,7 +9,10 @@ Usage
 
     var ni = require('ni-uri');
 
-    var uri = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.')
+    var value = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.');
+    // value === '71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w'
+
+    var uri = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.', true);
     // uri === 'ni:///sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w'
 
     var parts = ni.parse(uri);
