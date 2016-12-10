@@ -19,3 +19,15 @@ Usage
 
     var formatted = ni.format(parts);
     // formatted === uri
+    
+API
+---
+
+### ni.parse(uri, parseQuery)
+### ni.format(parts)
+### ni.digest(algorithm, data, encoding, parts)
+
+License
+-------
+
+MIT - see [LICENSE.md](./LICENSE.md).
