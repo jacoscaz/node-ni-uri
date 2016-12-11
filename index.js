@@ -83,6 +83,8 @@ function digest(algorithm, data, enc, parts) {
   var value = crypto.createHash(nodeAlgorithm)
     .update(data, enc)
     .digest('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
     .replace(/\=+$/, '');
   if (parts) {
     parts = extend({}, parts);
