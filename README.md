@@ -2,33 +2,59 @@
 NI-URI
 ======
 
-Parse, format and digest utilities for Named Information (NI) URIs
+Parsing, formating and digesting utilities for [Named Information (NI) URIs](https://tools.ietf.org/html/rfc6920) in Node.js land.
 
 Usage
 -----
 
-    var ni = require('ni-uri');
+#### install / require
 
-    var value = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.');
-    // value === '71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w'
+    $ npm install ni-uri
 
-    var uri = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.', true);
-    // uri === 'ni:///sha-256;71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w'
-
-    var parts = ni.parse(uri);
-    // parts.protocol === 'ni:'
-    // parts.algorithm === 'sha-256'
-    // parts.value === '71N/JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1+2w'
-
-    var formatted = ni.format(parts);
-    // formatted === uri
+    const ni = require('ni-uri');
     
-API
----
+#### .format(Object parts)
 
-### ni.parse(uri, [parseQuery])
-### ni.format(parts)
-### ni.digest(algorithm, data, [encoding], [parts])
+Similar to [Node.js' url#format()](https://nodejs.org/api/url.html#url_url_format_urlobject).
+
+    const result = ni.format({
+      host: example.com,
+      algorithm: 'sha-256',
+      value: '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w',
+      query: {q: '1'}
+    });
+    
+    // 'ni://example.con/sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w?q=1'
+
+#### .parse(string uri, boolean parseQuery)
+
+Similar to [Node.js' url#parse()](https://nodejs.org/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost).
+    
+    const result = ni.parse('ni://example.con/sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w?q=1', true);
+     
+    // {
+    //   protocol: 'ni',
+    //   algorithm: 'sha-256',
+    //   value: '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w',
+    //   host: 'example.com'
+    // }
+
+#### .digest([string algorithm], string | Buffer data, [string encoding], [Object | boolean parts])
+
+Generates the hash/value component for some data. Returns the has or a formatted uri. 
+
+    const result = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.');
+    
+    // returns '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w'
+
+    const result = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.', true);
+    
+    // returns 'ni:///sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w'
+
+    const result = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.', {host: 'example.com'});
+    
+    // returns 'ni://example.com/sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w'
+    
 
 License
 -------
