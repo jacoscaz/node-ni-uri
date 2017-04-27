@@ -41,7 +41,7 @@ Similar to [Node.js' url#parse()](https://nodejs.org/api/url.html#url_url_parse_
 
 #### .digest([string algorithm], string | Buffer data, [string encoding], [Object | boolean parts])
 
-Generates the hash/value component for some data. Returns the has or a formatted uri. 
+Generates the hash/value component for some data. Returns the hash or a formatted uri. 
 
     const result = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.');
     
