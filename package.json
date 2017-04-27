@@ -29,7 +29,7 @@
   },
   "author": "Jacopo Scazzosi <me@jacoscaz.com>",
   "engines": {
-    "node": ">=4.0.x"
+    "node": ">=6.0.x"
   },
   "license": "MIT",
   "homepage": "https://github.com/jacoscaz/node-ni-uri",
