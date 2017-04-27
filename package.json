@@ -1,21 +1,40 @@
 {
   "name": "ni-uri",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Parse, format and digest utilities for Named Information (NI) URIs",
+  "keywords": [
+    "node",
+    "nodejs",
+    "ni",
+    "uri",
+    "named",
+    "information"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "homepage": "https://github.com/jacoscaz/node-ni-uri/",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/jacoscaz/node-ni-uri.git"
+    "type": "git",
+    "url": "https://github.com/jacoscaz/node-ni-uri.git"
   },
-  "bugs": "https://github.com/jacoscaz/node-ni-uri/issues",
   "devDependencies": {
     "mocha": "^3.2.0",
-    "should": "^11.1.2"
+    "should": "^11.1.2",
+    "eslint": "^3.13.0",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0"
   },
   "author": "Jacopo Scazzosi <me@jacoscaz.com>",
-  "license": "MIT"
+  "engines": {
+    "node": ">=4.0.x"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/jacoscaz/node-ni-uri",
+  "bugs": "https://github.com/jacoscaz/node-ni-uri/issues",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
 }

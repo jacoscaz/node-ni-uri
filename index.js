@@ -1,93 +1,103 @@
 
 'use strict';
 
-var url = require('url');
-var crypto = require('crypto');
+const _ = require('lodash');
+const url = require('url');
+const assert = require('assert');
+const crypto = require('crypto');
 
-var NI_ALGOS_TO_NODE_ALGOS = {
+const ENCODINGS = {
+  ascii: true,
+  utf8: true,
+  utf16le: true,
+  ucs2: true,
+  base64: true,
+  latin1: true,
+  binary: true,
+  hex: true
+};
+
+const DEFAULT_ENCODING = 'utf8';
+
+const SUPPORTED_ALGORITHMS = {
   'sha-256': 'sha256',
   'sha-384': 'sha384',
   'sha-512': 'sha512'
 };
 
-var NI_URI_PATHNAME_REGEXP = /\/([a-z]{2,4}-[0-9]{2,4});([A-Za-z0-9+\-_/]+)$/;
+const DEFAULT_ALGORITHM = 'sha-256';
 
-function isNull(n) {
-  return n === null;
+const NI_VALUE_REGEXP = /[A-Za-z0-9+\-_/]+$/;
+
+function isEncoding(str) {
+  return _.isString(str) && !!ENCODINGS[str];
 }
 
-function isObject(o) {
-  return typeof(o) === 'object' && !isNull(o);
+function isValue(str) {
+  return _.isString(str) && !!str.match(NI_VALUE_REGEXP);
 }
 
-function isString(s) {
-  return typeof(s) === 'string';
+function isAlgorithm(str) {
+  return _.isString(str) && !!SUPPORTED_ALGORITHMS[str];
 }
 
-function extend(dest) {
-  var sources = Array.prototype.slice.call(arguments, 1);
-  for (var s = 0, source; s < sources.length; s++) {
-    source = sources[s];
-    if (isObject(source)) {
-      for (var key in source) {
-        if (source.hasOwnProperty(key)) {
-          dest[key] = source[key];
-        }
-      }
-    }
-  }
-  return dest;
+function isBuffer(obj) {
+  return Buffer.isBuffer(obj);
 }
 
-function isAlgorithmSupported(algorithm) {
-  return !!NI_ALGOS_TO_NODE_ALGOS[algorithm];
-}
-
-module.exports.isAlgorithmSupported = isAlgorithmSupported;
-
-function parse(uri, parseQuery) {
-  var parts = url.parse(uri, parseQuery);
-  var match = parts.pathname && parts.pathname.match(NI_URI_PATHNAME_REGEXP);
-  if (!match) {
-    throw new URIError('Invalid NI URI.');
-  }
-  parts.algorithm = match[1];
-  parts.value = match[2];
+function parse(uri, parseQuery, slashesDenoteHost) {
+  assert(_.isString(uri), 'Cannot parse NI-URI (not a string).');
+  const parts = url.parse(uri, parseQuery, slashesDenoteHost);
+  const pathnameParts = parts.pathname.slice(1).split(';');
+  assert(pathnameParts.length === 2, 'Cannot parse NI-URI (invalid pathname).');
+  assert(isAlgorithm(pathnameParts[0]), 'Cannot parse NI-URI (unsupported algorithm).');
+  assert(isValue(pathnameParts[1]), 'Cannot parse NI-URI (bad value).');
+  delete parts.pathname;
+  delete parts.path;
+  parts.algorithm = pathnameParts[0];
+  parts.value = pathnameParts[1];
   return parts;
 }
 
 module.exports.parse = parse;
 
 function format(parts) {
-  parts = extend({}, parts);
+  assert(_.isObject(parts), 'Cannot format NI-URI (not an object).');
+  assert(isAlgorithm(parts.algorithm), 'Cannot format NI-URI (unsupported algorithm).');
+  assert(isValue(parts.value), 'Cannot format NI-URI (bad value).');
+  parts = _.extend({}, parts);
   parts.slashes = true;
   parts.protocol = 'ni:';
-  if (parts.algorithm && parts.value) {
-    parts.pathname = parts.algorithm + ';' + parts.value;
-    delete parts.path;
-  }
+  parts.pathname = parts.algorithm + ';' + parts.value;
+  delete parts.path;
   return url.format(parts);
 }
 
 module.exports.format = format;
 
 function digest(algorithm, data, enc, parts) {
-  if (enc && !isString(enc)) {
+  if (!isAlgorithm(algorithm)) {
     parts = enc;
-    enc = null;
+    enc = data;
+    data = algorithm;
+    algorithm = DEFAULT_ALGORITHM;
   }
-  var nodeAlgorithm = NI_ALGOS_TO_NODE_ALGOS[algorithm];
-  if (!nodeAlgorithm) {
-    throw new Error('Unsupported algorithm.');
+  if (!_.isString(enc)) {
+    parts = enc;
+    enc = DEFAULT_ENCODING;
   }
-  var value = crypto.createHash(nodeAlgorithm)
+  assert(isAlgorithm(algorithm), 'Cannot digest data (unsupported algorithm).');
+  assert(_.isString(data) || isBuffer(data), 'Cannot digest data (invalid data).');
+  assert(_.isNil(enc) || isEncoding(enc), 'Cannot digest data (unsupported encoding).');
+  assert(_.isNil(parts) || parts === true || _.isObject(parts), 'Cannot digest data (invalid parts).');
+  const value = crypto.createHash(SUPPORTED_ALGORITHMS[algorithm])
     .update(data, enc)
     .digest('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
-    .replace(/\=+$/, '');
+    .replace(/=+$/, '');
   if (parts) {
-    parts = extend({}, parts);
+    parts = _.isObject(parts) ? _.extend({}, parts) : {};
     parts.value = value;
     parts.algorithm = algorithm;
     return format(parts);
