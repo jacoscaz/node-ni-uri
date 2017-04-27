@@ -50,8 +50,6 @@ function parse(uri, parseQuery, slashesDenoteHost) {
   const parts = url.parse(uri, parseQuery, slashesDenoteHost);
   const pathnameParts = parts.pathname.slice(1).split(';');
   assert(pathnameParts.length === 2, 'Cannot parse NI-URI (invalid pathname).');
-  assert(isAlgorithm(pathnameParts[0]), 'Cannot parse NI-URI (unsupported algorithm).');
-  assert(isValue(pathnameParts[1]), 'Cannot parse NI-URI (bad value).');
   delete parts.pathname;
   delete parts.path;
   parts.algorithm = pathnameParts[0];
@@ -63,7 +61,6 @@ module.exports.parse = parse;
 
 function format(parts) {
   assert(_.isObject(parts), 'Cannot format NI-URI (not an object).');
-  assert(isAlgorithm(parts.algorithm), 'Cannot format NI-URI (unsupported algorithm).');
   assert(isValue(parts.value), 'Cannot format NI-URI (bad value).');
   parts = _.extend({}, parts);
   parts.slashes = true;
