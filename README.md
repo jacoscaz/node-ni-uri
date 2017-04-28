@@ -2,7 +2,7 @@
 NI-URI
 ======
 
-Parsing, formating and digesting utilities for [Named Information (NI) URIs](https://tools.ietf.org/html/rfc6920) in Node.js land.
+Parsing, formatting and digesting utilities for [Named Information (NI) URIs](https://tools.ietf.org/html/rfc6920) in Node.js land.
 
 Usage
 -----
@@ -54,7 +54,16 @@ Generates the hash/value component for some data. Returns the hash or a formatte
     const result = ni.digest('sha-256', 'The quick brown fox jumps over the lazy dog.', {host: 'example.com'});
     
     // returns 'ni://example.com/sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w'
-    
+
+#### .isAlgorithm(string algorithm)
+
+Returns true if the string identifies a supported digest algorithm, false otherwise.
+
+To-Do
+-----
+
+- support for human-friendly `nih://` format
+- support for hash truncation
 
 License
 -------

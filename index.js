@@ -41,6 +41,8 @@ function isAlgorithm(str) {
   return _.isString(str) && !!SUPPORTED_ALGORITHMS[str];
 }
 
+module.exports.isAlgorithm = isAlgorithm;
+
 function isBuffer(obj) {
   return Buffer.isBuffer(obj);
 }
@@ -73,13 +75,13 @@ function format(parts) {
 module.exports.format = format;
 
 function digest(algorithm, data, enc, parts) {
-  if (!isAlgorithm(algorithm)) {
+  if (_.isString(algorithm) && !_.isString(data) && !isBuffer(data)) {
     parts = enc;
     enc = data;
     data = algorithm;
     algorithm = DEFAULT_ALGORITHM;
   }
-  if (!_.isString(enc)) {
+  if (_.isObject(enc) || _.isBoolean(enc)) {
     parts = enc;
     enc = DEFAULT_ENCODING;
   }

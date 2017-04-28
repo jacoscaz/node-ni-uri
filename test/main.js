@@ -5,6 +5,7 @@ const ni = require('../');
 const should = require('should');
 
 describe('Main test suite for ni-uri', () => {
+
   it('Should digest data correctly (auto)', () => {
     const data = 'The quick brown fox jumps over the lazy dog.';
     const value = '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w';
@@ -17,10 +18,28 @@ describe('Main test suite for ni-uri', () => {
     should(ni.digest('sha-256', data)).equal(value);
   });
 
+  it('Should digest data correctly (buffer)', () => {
+    const data = new Buffer('The quick brown fox jumps over the lazy dog.');
+    const value = '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w';
+    should(ni.digest('sha-256', data)).equal(value);
+  });
+
+  it('Should digest data correctly (encoding)', () => {
+    const data = new Buffer('The quick brown fox jumps over the lazy dog.').toString('hex');
+    const value = '71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w';
+    should(ni.digest('sha-256', data, 'hex')).equal(value);
+  });
+
   it('Should digest data and format correctly', () => {
     const data = 'The quick brown fox jumps over the lazy dog.';
     const uri = 'ni:///sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w';
     should(ni.digest('sha-256', data, true)).equal(uri);
+  });
+
+  it('Should digest data and format correctly (encoding)', () => {
+    const data = new Buffer('The quick brown fox jumps over the lazy dog.').toString('hex');
+    const uri = 'ni:///sha-256;71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w';
+    should(ni.digest('sha-256', data, 'hex', true)).equal(uri);
   });
 
   it('Should digest data and format correctly w/ parts', () => {
@@ -54,4 +73,12 @@ describe('Main test suite for ni-uri', () => {
     should(parts.value).equal('71N_JciVv6eCUmUpqbY9l6pjFWTV14nCt2VEjIY1-2w');
     should(parts.query.a).equal('1');
   });
+
+  it('Should identify supported algorithms correctly', () => {
+    should(ni.isAlgorithm('sha-256')).be.true();
+    should(ni.isAlgorithm('sha-384')).be.true();
+    should(ni.isAlgorithm('sha-512')).be.true();
+    should(ni.isAlgorithm('unsupported')).be.false();
+  });
+
 });
