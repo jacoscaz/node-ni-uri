@@ -1,7 +1,6 @@
 
 'use strict';
 
-const _ = require('lodash');
 const url = require('url');
 const assert = require('assert');
 const crypto = require('crypto');
@@ -29,16 +28,32 @@ const DEFAULT_ALGORITHM = 'sha-256';
 
 const NI_VALUE_REGEXP = /[A-Za-z0-9+\-_/]+$/;
 
+function isString(str) {
+  return typeof(str) === 'string';
+}
+
+function isObject(obj) {
+  return typeof(obj) === 'object' && obj !== null;
+}
+
+function isNil(val) {
+  return val === undefined || val === null;
+}
+
 function isEncoding(str) {
-  return _.isString(str) && !!ENCODINGS[str];
+  return isString(str) && !!ENCODINGS[str];
 }
 
 function isValue(str) {
-  return _.isString(str) && !!str.match(NI_VALUE_REGEXP);
+  return isString(str) && !!str.match(NI_VALUE_REGEXP);
 }
 
 function isAlgorithm(str) {
-  return _.isString(str) && !!SUPPORTED_ALGORITHMS[str];
+  return isString(str) && !!SUPPORTED_ALGORITHMS[str];
+}
+
+function isBoolean(bool) {
+  return typeof(bool) === 'boolean';
 }
 
 module.exports.isAlgorithm = isAlgorithm;
@@ -48,7 +63,7 @@ function isBuffer(obj) {
 }
 
 function parse(uri, parseQuery, slashesDenoteHost) {
-  assert(_.isString(uri), 'Cannot parse NI-URI (not a string).');
+  assert(isString(uri), 'Cannot parse NI-URI (not a string).');
   const parts = url.parse(uri, parseQuery, slashesDenoteHost);
   const pathnameParts = parts.pathname.slice(1).split(';');
   assert(pathnameParts.length === 2, 'Cannot parse NI-URI (invalid pathname).');
@@ -62,9 +77,9 @@ function parse(uri, parseQuery, slashesDenoteHost) {
 module.exports.parse = parse;
 
 function format(parts) {
-  assert(_.isObject(parts), 'Cannot format NI-URI (not an object).');
+  assert(isObject(parts), 'Cannot format NI-URI (not an object).');
   assert(isValue(parts.value), 'Cannot format NI-URI (bad value).');
-  parts = _.extend({}, parts);
+  parts = Object.assign({}, parts);
   parts.slashes = true;
   parts.protocol = 'ni:';
   parts.pathname = parts.algorithm + ';' + parts.value;
@@ -75,20 +90,20 @@ function format(parts) {
 module.exports.format = format;
 
 function digest(algorithm, data, enc, parts) {
-  if (_.isString(algorithm) && !_.isString(data) && !isBuffer(data)) {
+  if (isString(algorithm) && !isString(data) && !isBuffer(data)) {
     parts = enc;
     enc = data;
     data = algorithm;
     algorithm = DEFAULT_ALGORITHM;
   }
-  if (_.isObject(enc) || _.isBoolean(enc)) {
+  if (isObject(enc) || isBoolean(enc)) {
     parts = enc;
     enc = DEFAULT_ENCODING;
   }
   assert(isAlgorithm(algorithm), 'Cannot digest data (unsupported algorithm).');
-  assert(_.isString(data) || isBuffer(data), 'Cannot digest data (invalid data).');
-  assert(_.isNil(enc) || isEncoding(enc), 'Cannot digest data (unsupported encoding).');
-  assert(_.isNil(parts) || parts === true || _.isObject(parts), 'Cannot digest data (invalid parts).');
+  assert(isString(data) || isBuffer(data), 'Cannot digest data (invalid data).');
+  assert(isNil(enc) || isEncoding(enc), 'Cannot digest data (unsupported encoding).');
+  assert(isNil(parts) || parts === true || isObject(parts), 'Cannot digest data (invalid parts).');
   const value = crypto.createHash(SUPPORTED_ALGORITHMS[algorithm])
     .update(data, enc)
     .digest('base64')
@@ -96,7 +111,7 @@ function digest(algorithm, data, enc, parts) {
     .replace(/\//g, '_')
     .replace(/=+$/, '');
   if (parts) {
-    parts = _.isObject(parts) ? _.extend({}, parts) : {};
+    parts = isObject(parts) ? Object.assign({}, parts) : {};
     parts.value = value;
     parts.algorithm = algorithm;
     return format(parts);
